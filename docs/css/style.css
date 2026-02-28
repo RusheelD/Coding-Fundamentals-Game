@@ -197,6 +197,10 @@ body {
   overflow: visible;
   box-shadow: 0 3px 8px rgba(0,0,0,.3);
 }
+/* compact C-blocks in toolbox — rendered as flat blocks (no body/bottom) */
+.block.c-block.toolbox-compact {
+  border-radius: 10px;
+}
 
 /* Top bar of C-block */
 .c-block-top {

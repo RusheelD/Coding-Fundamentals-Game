@@ -139,6 +139,14 @@ class BlockManager {
 
         wrap.appendChild(top);
 
+        if (isToolbox) {
+            // Toolbox: flat preview — no body, no bottom bar
+            wrap.classList.add('toolbox-compact');
+            // Round off the top bar so it looks like a normal block
+            top.style.borderRadius = '10px';
+            return wrap;
+        }
+
         // --- body (drop zone for nested blocks) ---
         const body = document.createElement('div');
         body.className = 'c-block-body drop-zone';
@@ -156,9 +164,7 @@ class BlockManager {
         wrap.appendChild(bot);
 
         // remove button
-        if (!isToolbox) {
-            wrap.appendChild(this._makeRemoveBtn(wrap));
-        }
+        wrap.appendChild(this._makeRemoveBtn(wrap));
 
         // hide/show placeholder when body has children
         const observer = new MutationObserver(() => {
