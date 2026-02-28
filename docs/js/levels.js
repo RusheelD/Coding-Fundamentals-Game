@@ -82,6 +82,7 @@ const BLOCK_DEFS = {
  */
 const LEVELS = [
     // ──────────── LEVEL 1 ────────────
+    // Concept: move forward
     {
         title: 'First Steps',
         description: 'Move your character forward to reach the flag!',
@@ -99,14 +100,15 @@ const LEVELS = [
         gems: [],
         blocks: ['move_forward'],
         maxBlocks: 5,
-        stars: [5, 4, 3],  // blocks used thresholds for 3/2/1 star
+        stars: [5, 4, 3],
     },
 
     // ──────────── LEVEL 2 ────────────
+    // Concept: turns + gems for motivation
     {
-        title: 'Turn the Corner',
-        description: 'Navigate around the corner to reach the flag.',
-        hint: 'Move forward, then turn, then move forward again.',
+        title: 'Turn & Collect',
+        description: 'Navigate to the flag and pick up a gem on the way!',
+        hint: 'Move forward, turn, and don\'t forget to <b>Pick Up</b> the gem!',
         rows: 5, cols: 5,
         grid: [
             [0, 0, 0, 0, 0],
@@ -117,60 +119,38 @@ const LEVELS = [
         ],
         start: { r: 4, c: 0, dir: DIR.RIGHT },
         goals: [{ r: 0, c: 4 }],
-        gems: [],
-        blocks: ['move_forward', 'turn_left', 'turn_right'],
-        maxBlocks: 12,
-        stars: [12, 11, 9],
+        gems: [{ r: 4, c: 3 }, { r: 0, c: 1 }],
+        blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up'],
+        maxBlocks: 14,
+        stars: [14, 12, 11],
     },
 
     // ──────────── LEVEL 3 ────────────
+    // Concept: repeat loop + pick_up (introduced together)
     {
-        title: 'Repeat Yourself',
-        description: 'Use a loop to move across the board efficiently.',
-        hint: 'Put <b>Move Forward</b> inside a <b>Repeat</b> block.',
-        rows: 5, cols: 7,
+        title: 'Loop & Collect',
+        description: 'Collect all the gems using a <b>Repeat</b> loop — much faster than one block at a time!',
+        hint: 'Put <b>Move Forward</b> and <b>Pick Up</b> inside a <b>Repeat</b> block set to 5.',
+        rows: 3, cols: 6,
         grid: [
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1],
+            [0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1],
         ],
-        start: { r: 2, c: 0, dir: DIR.RIGHT },
-        goals: [{ r: 2, c: 6 }],
-        gems: [],
-        blocks: ['move_forward', 'turn_left', 'turn_right', 'repeat'],
-        maxBlocks: 4,
-        stars: [3, 2, 2],
+        start: { r: 1, c: 0, dir: DIR.RIGHT },
+        goals: [{ r: 1, c: 5 }],
+        gems: [{ r: 1, c: 1 }, { r: 1, c: 2 }, { r: 1, c: 3 }, { r: 1, c: 4 }, { r: 1, c: 5 }],
+        blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'repeat'],
+        maxBlocks: 6,
+        stars: [6, 4, 3],
     },
 
     // ──────────── LEVEL 4 ────────────
-    {
-        title: 'Gem Collector',
-        description: 'Collect all the gems, then reach the flag.',
-        hint: 'Pick up the gems as you walk. Can you use a <b>Repeat</b> loop?',
-        rows: 5, cols: 5,
-        grid: [
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-        ],
-        start: { r: 2, c: 0, dir: DIR.RIGHT },
-        goals: [{ r: 2, c: 4 }],
-        gems: [{ r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 }, { r: 2, c: 4 }],
-        blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'repeat'],
-        maxBlocks: 6,
-        stars: [6, 5, 4],
-    },
-
-    // ──────────── LEVEL 5 ────────────
-    // Concept: putting MULTIPLE commands inside one Repeat body
+    // Concept: multi-command repeat body + turns
     {
         title: 'Staircase',
-        description: 'Walk down the staircase to reach the flag! Look for a pattern you can repeat.',
-        hint: 'Each step is the same: <b>Forward, Turn Right, Forward, Turn Left</b>. Put all four inside one <b>Repeat</b>!',
+        description: 'Walk down the staircase collecting gems! Find the repeating pattern.',
+        hint: 'Each step is: <b>Forward, Pick Up, Turn Right, Forward, Turn Left</b>. Put them all inside one <b>Repeat</b>!',
         rows: 5, cols: 5,
         grid: [
             [0, 0, 1, 1, 1],
@@ -181,17 +161,17 @@ const LEVELS = [
         ],
         start: { r: 0, c: 0, dir: DIR.RIGHT },
         goals: [{ r: 4, c: 4 }],
-        gems: [],
+        gems: [{ r: 0, c: 1 }, { r: 1, c: 2 }, { r: 2, c: 3 }, { r: 3, c: 4 }],
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'repeat'],
         maxBlocks: 16,
-        stars: [16, 10, 5],
+        stars: [16, 10, 6],
     },
 
-    // ──────────── LEVEL 6 ────────────
-    // Concept: conditionals — If On Gem
+    // ──────────── LEVEL 5 ────────────
+    // Concept: If conditional (gem_here)
     {
         title: 'Choosy Collector',
-        description: 'Walk along the corridor and pick up only the gems — don\'t grab thin air!',
+        description: 'Walk the corridor and pick up only the gems — don\'t grab thin air!',
         hint: 'Use <b>If</b> (gem here) with <b>Pick Up</b> inside, all within a <b>Repeat</b> that also moves forward.',
         rows: 3, cols: 9,
         grid: [
@@ -208,34 +188,12 @@ const LEVELS = [
         stars: [12, 8, 4],
     },
 
-    // ──────────── LEVEL 7 ────────────
-    // Concept: While Path — loop without knowing the count
-    {
-        title: 'While You Can',
-        description: 'Use a while-loop to walk forward without counting steps!',
-        hint: '<b>While</b> (path ahead) keeps running its body as long as the path ahead is clear — no counting needed!',
-        rows: 4, cols: 8,
-        grid: [
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 0],
-        ],
-        start: { r: 0, c: 0, dir: DIR.RIGHT },
-        goals: [{ r: 3, c: 7 }],
-        gems: [],
-        blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'repeat', 'if_cond', 'while_cond'],
-        conditions: ['path_ahead', 'gem_here'],
-        maxBlocks: 12,
-        stars: [12, 8, 5],
-    },
-
-    // ──────────── LEVEL 8 ────────────
-    // Concept: combining While Path + If On Gem
+    // ──────────── LEVEL 6 ────────────
+    // Concept: While + If combined (skip separate while-only level)
     {
         title: 'Smart Collector',
-        description: 'Walk and collect gems automatically by combining a while-loop with a conditional!',
-        hint: 'Put <b>Move Forward</b> and <b>If</b> (gem here) with <b>Pick Up</b> inside a <b>While</b> (path ahead) loop.',
+        description: 'Walk and collect gems automatically — use <b>While</b> so you don\'t have to count steps!',
+        hint: 'Put <b>Move Forward</b> and <b>If</b> (gem here) → <b>Pick Up</b> inside a <b>While</b> (path ahead) loop.',
         rows: 3, cols: 10,
         grid: [
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -251,16 +209,18 @@ const LEVELS = [
         stars: [15, 8, 4],
     },
 
-    // ──────────── LEVEL 9 ────────────
-    // Concept: Paint action + loops
+    // ──────────── LEVEL 7 ────────────
+    // Concept: Paint + While + on_paint sensor
     {
         title: 'Painter Bot',
-        description: 'Paint every grey tile to turn it green!',
-        hint: 'Paint the tile you\'re on, then use a loop to <b>Move Forward</b> and <b>Paint</b> the rest.',
-        rows: 3, cols: 7,
+        description: 'Paint every grey tile to turn it green! Use <b>While</b> for the long stretches.',
+        hint: 'Paint the tile you\'re on, then use <b>While</b> (path ahead) with <b>Move Forward</b> and <b>If</b> (on paint tile) → <b>Paint</b>.',
+        rows: 5, cols: 7,
         grid: [
             [1, 1, 1, 1, 1, 1, 1],
             [5, 5, 5, 5, 5, 5, 5],
+            [1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 5, 5, 5],
             [1, 1, 1, 1, 1, 1, 1],
         ],
         start: { r: 1, c: 0, dir: DIR.RIGHT },
@@ -269,16 +229,16 @@ const LEVELS = [
         requirePaint: true,
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
         conditions: ['path_ahead', 'gem_here', 'on_paint'],
-        maxBlocks: 14,
-        stars: [14, 8, 4],
+        maxBlocks: 18,
+        stars: [18, 12, 8],
     },
 
-    // ──────────── LEVEL 10 ────────────
-    // Concept: nested Repeat loops
+    // ──────────── LEVEL 8 ────────────
+    // Concept: nested Repeat loops — paint border
     {
-        title: 'Code Master',
-        description: 'Paint the entire border of the room. Can you find the repeating pattern?',
-        hint: 'Each side is the same: move and paint 4 times, then turn. Use a <b>Repeat</b> inside a <b>Repeat</b>!',
+        title: 'Border Painter',
+        description: 'Paint the entire border of the room. Find the repeating pattern!',
+        hint: 'Each side: move and paint 4 times, then turn. Use a <b>Repeat</b> inside a <b>Repeat</b>!',
         rows: 5, cols: 5,
         grid: [
             [5, 5, 5, 5, 5],
@@ -294,7 +254,53 @@ const LEVELS = [
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
         conditions: ['path_ahead', 'gem_here', 'on_paint', 'wall_ahead'],
         maxBlocks: 20,
-        stars: [20, 16, 6],
+        stars: [20, 12, 6],
+    },
+
+    // ──────────── LEVEL 9 ────────────
+    // Concept: switches & gates — step on switch to open gate
+    {
+        title: 'Gate Runner',
+        description: 'A blue gate blocks your path! Find the switch to open it.',
+        hint: 'Go down to the blue switch first — it opens the gate. Then navigate back up and through!',
+        rows: 4, cols: 5,
+        grid: [
+            [0, 0, 8, 0, 0],
+            [0, 1, 1, 1, 0],
+            [0, 0, 7, 1, 1],
+            [1, 1, 1, 1, 1],
+        ],
+        start: { r: 0, c: 0, dir: DIR.DOWN },
+        goals: [{ r: 0, c: 4 }],
+        gems: [{ r: 1, c: 0 }, { r: 0, c: 3 }],
+        blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
+        conditions: ['path_ahead', 'gem_here', 'on_paint', 'wall_ahead'],
+        maxBlocks: 18,
+        stars: [18, 14, 10],
+    },
+
+    // ──────────── LEVEL 10 ────────────
+    // Concept: block-mode capstone — gems, paint, gates, loops, conditionals
+    {
+        title: 'Code Master',
+        description: 'The ultimate block challenge! Collect gems, paint tiles, open the gate, and reach the flag.',
+        hint: 'Use <b>While</b> (path ahead) for stretches, <b>If</b> (gem here) to collect, and <b>If</b> (on paint) to paint. The switch opens the gate!',
+        rows: 5, cols: 7,
+        grid: [
+            [0, 0, 0, 0, 0, 1, 1],
+            [1, 1, 1, 1, 0, 1, 1],
+            [7, 0, 0, 0, 0, 8, 0],
+            [1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 5, 5, 5, 5, 0],
+        ],
+        start: { r: 0, c: 0, dir: DIR.RIGHT },
+        goals: [{ r: 4, c: 1 }],
+        gems: [{ r: 0, c: 2 }, { r: 0, c: 4 }, { r: 2, c: 1 }, { r: 2, c: 3 }],
+        requirePaint: true,
+        blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
+        conditions: ['path_ahead', 'gem_here', 'on_paint', 'wall_ahead'],
+        maxBlocks: 35,
+        stars: [35, 25, 18],
     },
 
     // ══════════════════════════════════════════════════════════
