@@ -32,6 +32,14 @@ body {
 .ls-star-total {
   font-size: 1.1rem; color: #facc15; font-weight: 700;
 }
+.ls-reset-btn {
+  margin-top: .8rem; padding: 6px 18px;
+  background: rgba(255,255,255,.08); color: #aaa;
+  border: 1px solid rgba(255,255,255,.15); border-radius: 6px;
+  font-size: .78rem; font-weight: 600; cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.ls-reset-btn:hover { background: #e94560; color: #fff; border-color: #e94560; }
 .ls-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);

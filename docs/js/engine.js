@@ -23,11 +23,33 @@ class GameEngine {
         this.onFinish = null;
         this.starsEarned = [];
         this.unlockedLevels = 1;
+        this._loadProgress();
     }
 
-    /* -------- persistence (disabled – resets on refresh) -------- */
-    _loadProgress() { /* no-op */ }
-    _saveProgress() { /* no-op */ }
+    /* -------- persistence (localStorage) -------- */
+    _loadProgress() {
+        try {
+            const raw = localStorage.getItem('codequest_progress');
+            if (raw) {
+                const d = JSON.parse(raw);
+                this.starsEarned = d.stars || [];
+                this.unlockedLevels = d.unlocked || 1;
+            }
+        } catch (e) { /* ignore */ }
+    }
+    _saveProgress() {
+        try {
+            localStorage.setItem('codequest_progress', JSON.stringify({
+                stars: this.starsEarned,
+                unlocked: this.unlockedLevels,
+            }));
+        } catch (e) { /* ignore */ }
+    }
+    resetProgress() {
+        this.starsEarned = [];
+        this.unlockedLevels = 1;
+        try { localStorage.removeItem('codequest_progress'); } catch (e) { /* ignore */ }
+    }
 
     /* -------- level loading -------- */
     loadLevel(index) {
@@ -310,10 +332,12 @@ class GameEngine {
         if (this.levelIndex + 1 >= this.unlockedLevels) {
             this.unlockedLevels = Math.min(this.levelIndex + 2, LEVELS.length);
         }
+        this._saveProgress();
         return s;
     }
 
     unlockAll() {
         this.unlockedLevels = LEVELS.length;
+        this._saveProgress();
     }
 }

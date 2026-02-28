@@ -66,6 +66,14 @@
         }
     });
 
+    /* reset progress button */
+    document.getElementById('ls-reset-btn').addEventListener('click', () => {
+        if (confirm('Reset all progress? This cannot be undone.')) {
+            engine.resetProgress();
+            renderLevelCards();
+        }
+    });
+
     function renderLevelCards() {
         const totalStars = engine.starsEarned.reduce((a, b) => a + (b || 0), 0);
         const maxStars = LEVELS.length * 3;
