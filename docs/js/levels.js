@@ -119,10 +119,10 @@ const LEVELS = [
         ],
         start: { r: 4, c: 0, dir: DIR.RIGHT },
         goals: [{ r: 0, c: 4 }],
-        gems: [{ r: 4, c: 3 }, { r: 0, c: 1 }],
+        gems: [{ r: 4, c: 3 }],
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up'],
         maxBlocks: 14,
-        stars: [14, 12, 11],
+        stars: [14, 13, 12],
     },
 
     // ──────────── LEVEL 3 ────────────
