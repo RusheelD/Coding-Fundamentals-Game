@@ -62,6 +62,8 @@ class GameEngine {
 
     async _execTree(blocks, done) {
         let iterations = 0;
+        const BREAK = Symbol('break');
+
         const exec = async (list) => {
             for (const b of list) {
                 if (!this.running) return;
@@ -71,24 +73,25 @@ class GameEngine {
                     return;
                 }
 
+                if (b.type === 'break') {
+                    return BREAK;
+                }
+
                 if (b.type === 'repeat') {
                     const count = Math.min(parseInt(b.inputValue) || 2, 100);
                     for (let i = 0; i < count; i++) {
                         if (!this.running) return;
-                        await exec(b.children || []);
+                        const r = await exec(b.children || []);
+                        if (r === BREAK) break;
                     }
                 } else if (b.type === 'while') {
-                    const testCond = () => {
-                        let r = this._evalCondition(b.condition);
-                        return b.negate ? !r : r;
-                    };
-                    while (this.running && testCond() && iterations < this.maxIterations) {
+                    while (this.running && this._evalCondition(b.condition) && iterations < this.maxIterations) {
                         iterations++;
-                        await exec(b.children || []);
+                        const r = await exec(b.children || []);
+                        if (r === BREAK) break;
                     }
                 } else if (b.type === 'if') {
-                    let cond = this._evalCondition(b.condition);
-                    if (b.negate) cond = !cond;
+                    const cond = this._evalCondition(b.condition);
                     if (cond) {
                         await exec(b.children || []);
                     } else if (b.elseChildren) {
@@ -125,8 +128,16 @@ class GameEngine {
 
     stop() { this.running = false; if (this._stepResolve) { this._stepResolve(); this._stepResolve = null; } }
 
-    /* -------- condition evaluator -------- */
+    /* -------- condition evaluator (supports compound and/or) -------- */
     _evalCondition(cond) {
+        // compound operators: not, and, or
+        if (typeof cond === 'object' && cond.op) {
+            if (cond.op === 'not') return !this._evalCondition(cond.operand);
+            const left = this._evalCondition(cond.left);
+            const right = this._evalCondition(cond.right);
+            if (cond.op === 'and') return left && right;
+            if (cond.op === 'or') return left || right;
+        }
         switch (cond) {
             case 'path_ahead': return !this._wallInRelDir(0);
             case 'path_right': return !this._wallInRelDir(1);
@@ -135,6 +146,9 @@ class GameEngine {
             case 'wall_ahead': return this._wallInRelDir(0);
             case 'gem_here': return this._onGem();
             case 'on_paint': return this._onPaintTile();
+            case 'on_flag': return this._onFlag();
+            case 'all_collected': return this._allCollected();
+            case 'all_painted': return this._allPainted();
             default: return false;
         }
     }
@@ -231,6 +245,18 @@ class GameEngine {
 
     _onPaintTile() {
         return this.grid[this.playerR][this.playerC] === TILE.PAINT;
+    }
+
+    _onFlag() {
+        return this.level.goals.some(g => g.r === this.playerR && g.c === this.playerC);
+    }
+
+    _allCollected() {
+        return this.gemsLeft.length === 0;
+    }
+
+    _allPainted() {
+        return this.grid.flat().every(t => t !== TILE.PAINT);
     }
 
     /* -------- win / lose check -------- */

@@ -129,6 +129,7 @@
 
         // toggle block vs text UI
         const isText = currentMode === 'text';
+        $('#toolbox-panel').classList.toggle('text-mode', isText);
         $('#toolbox').classList.toggle('hidden', isText);
         codeReference.classList.toggle('hidden', !isText);
         $('#workspace').classList.toggle('hidden', isText);
@@ -328,13 +329,32 @@
 
     function populateReference(cmds) {
         codeReference.innerHTML = '';
+        const esc = s => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        // Group commands by category
+        const grouped = new Map();
         for (const key of cmds) {
             const def = TEXT_CMD_DEFS[key];
             if (!def) continue;
-            const card = document.createElement('div');
-            card.className = `ref-card cat-${def.cat}`;
-            card.innerHTML = `<code>${def.syntax}</code><span class="ref-desc">${def.desc}</span>`;
-            codeReference.appendChild(card);
+            const group = CAT_GROUPS.find(g => g.cats.includes(def.cat));
+            const gKey = group ? group.key : 'other';
+            if (!grouped.has(gKey)) grouped.set(gKey, []);
+            grouped.get(gKey).push({ key, def });
+        }
+
+        for (const group of CAT_GROUPS) {
+            const items = grouped.get(group.key);
+            if (!items || items.length === 0) continue;
+            const hdr = document.createElement('div');
+            hdr.className = 'ref-cat-header';
+            hdr.textContent = group.label;
+            codeReference.appendChild(hdr);
+            for (const { def } of items) {
+                const card = document.createElement('div');
+                card.className = `ref-card cat-${def.cat}`;
+                card.innerHTML = `<code>${esc(def.syntax)}</code><span class="ref-desc">${esc(def.desc)}</span>`;
+                codeReference.appendChild(card);
+            }
         }
     }
 

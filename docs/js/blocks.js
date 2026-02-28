@@ -23,11 +23,27 @@ class BlockManager {
         this.toolboxEl.innerHTML = '';
         this.workspaceEl.innerHTML = '';
 
+        // Group blocks by category
+        const grouped = new Map();
         for (const type of blockTypes) {
             const def = BLOCK_DEFS[type];
             if (!def) continue;
-            const el = this._createBlockEl(type, def, true);
-            this.toolboxEl.appendChild(el);
+            const group = CAT_GROUPS.find(g => g.cats.includes(def.cat));
+            const key = group ? group.key : 'other';
+            if (!grouped.has(key)) grouped.set(key, []);
+            grouped.get(key).push({ type, def });
+        }
+
+        for (const group of CAT_GROUPS) {
+            const items = grouped.get(group.key);
+            if (!items || items.length === 0) continue;
+            const hdr = document.createElement('div');
+            hdr.className = 'toolbox-cat-header';
+            hdr.textContent = group.label;
+            this.toolboxEl.appendChild(hdr);
+            for (const { type, def } of items) {
+                this.toolboxEl.appendChild(this._createBlockEl(type, def, true));
+            }
         }
         this._updateBlockCount();
     }
@@ -301,15 +317,17 @@ class BlockManager {
             // read condition dropdown (C-blocks) or direction select (flat blocks)
             const select = el.querySelector(':scope > .c-block-top > select') || el.querySelector(':scope > select');
             if (select) {
-                if (node.type === 'if_cond' || node.type === 'while_cond') {
+                if (node.type === 'if_cond' || node.type === 'while_cond' || node.type === 'if_not_cond' || node.type === 'while_not_cond') {
                     node.condition = select.value;
                 } else {
                     node.direction = select.value;
                 }
             }
-            // map if_cond / while_cond → generic engine types
+            // map block types → generic engine types; wrap condition in {op:'not'} for not-variants
             if (node.type === 'if_cond') node.type = 'if';
+            if (node.type === 'if_not_cond') { node.type = 'if'; node.condition = { op: 'not', operand: node.condition }; }
             if (node.type === 'while_cond') node.type = 'while';
+            if (node.type === 'while_not_cond') { node.type = 'while'; node.condition = { op: 'not', operand: node.condition }; }
             // read children (nested blocks)
             const body = el.querySelector(':scope > .block-body, :scope > .c-block-body');
             if (body) node.children = this._readBlocks(body);
