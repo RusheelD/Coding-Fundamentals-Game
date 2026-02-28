@@ -43,6 +43,25 @@
     let isFast = false;
     let currentMode = 'blocks';
 
+    /* -------- per-level solution persistence -------- */
+    function saveSolution(index) {
+        try {
+            const store = JSON.parse(localStorage.getItem('codequest_solutions') || '{}');
+            if (currentMode === 'text') {
+                store[index] = { mode: 'text', code: codeEditor.value };
+            } else {
+                store[index] = { mode: 'blocks', data: blocks.serializeWorkspace() };
+            }
+            localStorage.setItem('codequest_solutions', JSON.stringify(store));
+        } catch (e) { /* ignore */ }
+    }
+    function loadSolution(index) {
+        try {
+            const store = JSON.parse(localStorage.getItem('codequest_solutions') || '{}');
+            return store[index] || null;
+        } catch (e) { return null; }
+    }
+
     /* -------- init: show level select -------- */
     levelTotal.textContent = LEVELS.length;
     showLevelSelectScreen();
@@ -52,6 +71,8 @@
     /* ========================================================= */
     function showLevelSelectScreen() {
         engine.stop();
+        // auto-save current solution before leaving
+        if (engine.levelIndex != null) saveSolution(engine.levelIndex);
         levelSelectScreen.classList.remove('hidden');
         topBar.classList.add('hidden');
         appMain.classList.add('hidden');
@@ -70,6 +91,7 @@
     document.getElementById('ls-reset-btn').addEventListener('click', () => {
         if (confirm('Reset all progress? This cannot be undone.')) {
             engine.resetProgress();
+            try { localStorage.removeItem('codequest_solutions'); } catch (e) { /* ignore */ }
             renderLevelCards();
         }
     });
@@ -141,10 +163,15 @@
 
         if (isText) {
             populateReference(lv.textCommands || []);
-            codeEditor.value = '';
+            const saved = loadSolution(index);
+            codeEditor.value = (saved && saved.mode === 'text') ? saved.code : '';
             updateLineCount();
         } else {
             blocks.setLevel(lv.blocks, lv.maxBlocks, lv.conditions || []);
+            const saved = loadSolution(index);
+            if (saved && saved.mode === 'blocks' && saved.data) {
+                blocks.restoreWorkspace(saved.data);
+            }
         }
 
         levelNum.textContent = index + 1;
@@ -192,6 +219,7 @@
         blocks.clearHighlights();
         drawWorld();
         if (result.success) {
+            saveSolution(engine.levelIndex);
             const usedBlocks = currentMode === 'text' ? parser.countLines(codeEditor.value) : blocks.countBlocks();
             const stars = engine.recordWin(usedBlocks);
             updateStars();

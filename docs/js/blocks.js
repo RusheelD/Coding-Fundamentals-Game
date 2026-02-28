@@ -349,6 +349,62 @@ class BlockManager {
         this._updateBlockCount();
     }
 
+    /* -------- serialize / restore workspace -------- */
+    serializeWorkspace() {
+        return this._serializeContainer(this.workspaceEl);
+    }
+
+    _serializeContainer(container) {
+        const arr = [];
+        for (const el of container.children) {
+            if (!el.classList.contains('block')) continue;
+            const obj = { type: el.dataset.type };
+            const input = el.querySelector(':scope > input[type="number"], :scope > .c-block-top > input[type="number"]');
+            if (input) obj.inputValue = input.value;
+            const select = el.querySelector(':scope > .c-block-top > select') || el.querySelector(':scope > select');
+            if (select) obj.selectValue = select.value;
+            const body = el.querySelector(':scope > .c-block-body');
+            if (body) obj.children = this._serializeContainer(body);
+            arr.push(obj);
+        }
+        return arr;
+    }
+
+    restoreWorkspace(data) {
+        this.workspaceEl.innerHTML = '';
+        if (!data || !data.length) { this._updateBlockCount(); return; }
+        for (const item of data) {
+            this._restoreBlock(item, this.workspaceEl);
+        }
+        this._updateBlockCount();
+    }
+
+    _restoreBlock(item, container) {
+        const def = BLOCK_DEFS[item.type];
+        if (!def) return;
+        const el = this._createBlockEl(item.type, def, false);
+        // restore input value
+        if (item.inputValue != null) {
+            const input = el.querySelector(':scope > input[type="number"], :scope > .c-block-top > input[type="number"]');
+            if (input) input.value = item.inputValue;
+        }
+        // restore select value
+        if (item.selectValue != null) {
+            const select = el.querySelector(':scope > .c-block-top > select') || el.querySelector(':scope > select');
+            if (select) select.value = item.selectValue;
+        }
+        container.appendChild(el);
+        // restore nested children
+        if (item.children && item.children.length) {
+            const body = el.querySelector(':scope > .c-block-body');
+            if (body) {
+                for (const child of item.children) {
+                    this._restoreBlock(child, body);
+                }
+            }
+        }
+    }
+
     /* -------- highlight -------- */
     highlightBlock(id) {
         this.workspaceEl.querySelectorAll('.block').forEach(b => b.classList.remove('running'));
