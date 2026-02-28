@@ -23,7 +23,7 @@ Visit the live site (once GitHub Pages is enabled) or open `pages/index.html` lo
 
 ## Project Structure
 
-```
+```text
 pages/
 ├── index.html          # Main page
 ├── css/style.css       # Styles
