@@ -23,23 +23,11 @@ class GameEngine {
         this.onFinish = null;
         this.starsEarned = [];
         this.unlockedLevels = 1;
-        this._loadProgress();
     }
 
-    /* -------- persistence -------- */
-    _loadProgress() {
-        try {
-            const d = JSON.parse(localStorage.getItem('codequest_progress') || '{}');
-            this.starsEarned = d.stars || [];
-            this.unlockedLevels = d.unlocked || 1;
-        } catch { /* ignore */ }
-    }
-    _saveProgress() {
-        localStorage.setItem('codequest_progress', JSON.stringify({
-            stars: this.starsEarned,
-            unlocked: this.unlockedLevels,
-        }));
-    }
+    /* -------- persistence (disabled – resets on refresh) -------- */
+    _loadProgress() { /* no-op */ }
+    _saveProgress() { /* no-op */ }
 
     /* -------- level loading -------- */
     loadLevel(index) {
@@ -108,7 +96,7 @@ class GameEngine {
                     }
                 } else {
                     // primitive action
-                    const result = this._execAction(b.type);
+                    const result = this._execAction(b);
                     if (this.onStep) this.onStep({ blockId: b.id, action: b.type, ...this._snapshot(), result });
                     if (!result.ok) {
                         this.running = false;
@@ -140,8 +128,11 @@ class GameEngine {
     /* -------- condition evaluator -------- */
     _evalCondition(cond) {
         switch (cond) {
-            case 'path_ahead': return !this._wallAhead();
-            case 'wall_ahead': return this._wallAhead();
+            case 'path_ahead': return !this._wallInRelDir(0);
+            case 'path_right': return !this._wallInRelDir(1);
+            case 'path_behind': return !this._wallInRelDir(2);
+            case 'path_left': return !this._wallInRelDir(3);
+            case 'wall_ahead': return this._wallInRelDir(0);
             case 'gem_here': return this._onGem();
             case 'on_paint': return this._onPaintTile();
             default: return false;
@@ -149,15 +140,25 @@ class GameEngine {
     }
 
     /* -------- primitive actions -------- */
-    _execAction(type) {
-        switch (type) {
+    _execAction(node) {
+        switch (node.type) {
             case 'move_forward': return this._moveForward();
             case 'turn_left': this.playerDir = (this.playerDir + 3) % 4; return { ok: true };
             case 'turn_right': this.playerDir = (this.playerDir + 1) % 4; return { ok: true };
+            case 'turn_to': return this._turnTo(node.direction);
             case 'pick_up': return this._pickUp();
             case 'paint': return this._paint();
             default: return { ok: true };
         }
+    }
+
+    _turnTo(dir) {
+        const MAP = { north: DIR.UP, south: DIR.DOWN, east: DIR.RIGHT, west: DIR.LEFT };
+        if (MAP[dir] !== undefined) {
+            this.playerDir = MAP[dir];
+            return { ok: true };
+        }
+        return { ok: false, msg: 'Unknown direction: ' + dir };
     }
 
     _moveForward() {
@@ -210,13 +211,18 @@ class GameEngine {
     }
 
     /* -------- sensors -------- */
-    _wallAhead() {
-        const d = DIR_DELTA[this.playerDir];
+    _wallInRelDir(offset) {
+        const absDir = (this.playerDir + offset) % 4;
+        const d = DIR_DELTA[absDir];
         const nr = this.playerR + d.dr;
         const nc = this.playerC + d.dc;
         if (nr < 0 || nr >= this.level.rows || nc < 0 || nc >= this.level.cols) return true;
         const t = this.grid[nr][nc];
         return t === TILE.WALL || t === TILE.GATE_A_CLOSED || t === TILE.GATE_B_CLOSED;
+    }
+
+    _wallAhead() {
+        return this._wallInRelDir(0);
     }
 
     _onGem() {
@@ -278,7 +284,10 @@ class GameEngine {
         if (this.levelIndex + 1 >= this.unlockedLevels) {
             this.unlockedLevels = Math.min(this.levelIndex + 2, LEVELS.length);
         }
-        this._saveProgress();
         return s;
+    }
+
+    unlockAll() {
+        this.unlockedLevels = LEVELS.length;
     }
 }

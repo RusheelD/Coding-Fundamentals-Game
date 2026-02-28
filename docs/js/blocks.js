@@ -49,6 +49,22 @@ class BlockManager {
 
         el.innerHTML = `<span class="icon">${def.icon}</span><span class="label">${def.label}</span>`;
 
+        // direction / option dropdown for flat blocks (e.g. turn_to)
+        if (def.selectOptions) {
+            const select = document.createElement('select');
+            select.className = 'block-condition-select';
+            for (const [val, lbl] of Object.entries(def.selectOptions)) {
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = lbl;
+                select.appendChild(opt);
+            }
+            select.addEventListener('click', e => e.stopPropagation());
+            select.addEventListener('mousedown', e => e.stopPropagation());
+            select.addEventListener('dragstart', e => e.stopPropagation());
+            el.appendChild(select);
+        }
+
         // remove button (only for workspace copies)
         if (!isToolbox) {
             el.appendChild(this._makeRemoveBtn(el));
@@ -282,9 +298,15 @@ class BlockManager {
             // read input value (may be direct child or inside .c-block-top)
             const input = el.querySelector(':scope > input[type="number"], :scope > .c-block-top > input[type="number"]');
             if (input) node.inputValue = input.value;
-            // read condition dropdown
-            const select = el.querySelector(':scope > .c-block-top > select');
-            if (select) node.condition = select.value;
+            // read condition dropdown (C-blocks) or direction select (flat blocks)
+            const select = el.querySelector(':scope > .c-block-top > select') || el.querySelector(':scope > select');
+            if (select) {
+                if (node.type === 'if_cond' || node.type === 'while_cond') {
+                    node.condition = select.value;
+                } else {
+                    node.direction = select.value;
+                }
+            }
             // map if_cond / while_cond → generic engine types
             if (node.type === 'if_cond') node.type = 'if';
             if (node.type === 'while_cond') node.type = 'while';

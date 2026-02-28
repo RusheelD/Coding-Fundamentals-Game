@@ -2,8 +2,11 @@
    parser.js – Python-like text → engine AST
    ========================================================= */
 
-/** Valid condition function names the parser recognises. */
-const PARSER_CONDITIONS = ['path_ahead', 'wall_ahead', 'gem_here', 'on_paint'];
+/** Valid condition keys the parser recognises. */
+const PARSER_CONDITIONS = [
+    'path_ahead', 'path_behind', 'path_left', 'path_right',
+    'wall_ahead', 'gem_here', 'on_paint',
+];
 
 /**
  *  Reference definitions for text-mode commands.
@@ -14,16 +17,20 @@ const TEXT_CMD_DEFS = {
     move: { syntax: 'move()', desc: 'Move one step forward', cat: 'move' },
     turn_left: { syntax: 'turn(left)', desc: 'Turn 90° left', cat: 'turn' },
     turn_right: { syntax: 'turn(right)', desc: 'Turn 90° right', cat: 'turn' },
+    turn_to: { syntax: 'turn(north/south/east/west)', desc: 'Face a cardinal direction', cat: 'turn' },
     pick_up: { syntax: 'pick_up()', desc: 'Pick up a gem', cat: 'action' },
     paint: { syntax: 'paint()', desc: 'Paint the current tile', cat: 'action' },
     // ── control ──
     for_range: { syntax: 'for i in range(N):', desc: 'Repeat N times (indent body 4 spaces)', cat: 'loop' },
-    if_cond: { syntax: 'if <condition>():', desc: 'Run body if condition is true', cat: 'cond' },
-    if_not_cond: { syntax: 'if not <condition>():', desc: 'Run body if condition is false', cat: 'cond' },
-    while_cond: { syntax: 'while <condition>():', desc: 'Loop while condition is true', cat: 'loop' },
+    if_cond: { syntax: 'if <condition>:', desc: 'Run body if condition is true', cat: 'cond' },
+    if_not_cond: { syntax: 'if not <condition>:', desc: 'Run body if condition is false', cat: 'cond' },
+    while_cond: { syntax: 'while <condition>:', desc: 'Loop while condition is true', cat: 'loop' },
     else_clause: { syntax: 'else:', desc: 'Run body if the if-condition was false', cat: 'cond' },
     // ── sensors (shown as reference) ──
-    cond_path_ahead: { syntax: 'path_ahead()', desc: 'True if the way ahead is clear', cat: 'sensor' },
+    cond_path_ahead: { syntax: 'path(ahead)', desc: 'True if the way ahead is clear', cat: 'sensor' },
+    cond_path_behind: { syntax: 'path(behind)', desc: 'True if the way behind is clear', cat: 'sensor' },
+    cond_path_left: { syntax: 'path(left)', desc: 'True if the way left is clear', cat: 'sensor' },
+    cond_path_right: { syntax: 'path(right)', desc: 'True if the way right is clear', cat: 'sensor' },
     cond_wall_ahead: { syntax: 'wall_ahead()', desc: 'True if there is a wall ahead', cat: 'sensor' },
     cond_gem_here: { syntax: 'gem_here()', desc: 'True if standing on a gem', cat: 'sensor' },
     cond_on_paint: { syntax: 'on_paint()', desc: 'True if on an unpainted tile', cat: 'sensor' },
@@ -83,12 +90,15 @@ class TextParser {
                 continue;
             }
 
-            // while <condition>():  /  while not <condition>():
-            if ((m = trimmed.match(/^while\s+(not\s+)?(\w+)\(\)\s*:$/))) {
+            // while <condition>:  /  while not <condition>:
+            // Supports both cond() and cond(param) forms
+            if ((m = trimmed.match(/^while\s+(not\s+)?(\w+)\((\w*)\)\s*:$/))) {
                 const negate = !!m[1];
-                const condName = m[2];
+                const funcName = m[2];
+                const param = m[3];
+                const condName = param ? `${funcName}_${param}` : funcName;
                 if (!PARSER_CONDITIONS.includes(condName)) {
-                    throw new Error(`Line ${i + 1}: unknown condition "${condName}"`);
+                    throw new Error(`Line ${i + 1}: unknown condition "${funcName}(${param})"`);
                 }
                 const child = this._parseBlock(lines, i + 1, expectedIndent + 4);
                 if (child.nodes.length === 0) throw new Error(`Line ${i + 1}: while-loop body is empty (indent body 4 spaces)`);
@@ -97,12 +107,15 @@ class TextParser {
                 continue;
             }
 
-            // if <condition>():  /  if not <condition>():
-            if ((m = trimmed.match(/^if\s+(not\s+)?(\w+)\(\)\s*:$/))) {
+            // if <condition>:  /  if not <condition>:
+            // Supports both cond() and cond(param) forms
+            if ((m = trimmed.match(/^if\s+(not\s+)?(\w+)\((\w*)\)\s*:$/))) {
                 const negate = !!m[1];
-                const condName = m[2];
+                const funcName = m[2];
+                const param = m[3];
+                const condName = param ? `${funcName}_${param}` : funcName;
                 if (!PARSER_CONDITIONS.includes(condName)) {
-                    throw new Error(`Line ${i + 1}: unknown condition "${condName}"`);
+                    throw new Error(`Line ${i + 1}: unknown condition "${funcName}(${param})"`);
                 }
                 const startLine = i;
                 const child = this._parseBlock(lines, i + 1, expectedIndent + 4);
@@ -117,8 +130,13 @@ class TextParser {
 
             // ---- simple commands ----
             if (/^move\(\)$/.test(trimmed)) { nodes.push({ type: 'move_forward', id: `t${i}` }); i++; continue; }
-            if (/^turn\(left\)$/.test(trimmed)) { nodes.push({ type: 'turn_left', id: `t${i}` }); i++; continue; }
-            if (/^turn\(right\)$/.test(trimmed)) { nodes.push({ type: 'turn_right', id: `t${i}` }); i++; continue; }
+            if ((m = trimmed.match(/^turn\((left|right|north|south|east|west)\)$/))) {
+                const dir = m[1];
+                if (dir === 'left') nodes.push({ type: 'turn_left', id: `t${i}` });
+                else if (dir === 'right') nodes.push({ type: 'turn_right', id: `t${i}` });
+                else nodes.push({ type: 'turn_to', direction: dir, id: `t${i}` });
+                i++; continue;
+            }
             if (/^pick_up\(\)$/.test(trimmed)) { nodes.push({ type: 'pick_up', id: `t${i}` }); i++; continue; }
             if (/^paint\(\)$/.test(trimmed)) { nodes.push({ type: 'paint', id: `t${i}` }); i++; continue; }
 

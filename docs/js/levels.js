@@ -36,6 +36,9 @@ const TILE = {
  */
 const CONDITIONS = {
     path_ahead: { label: 'path ahead' },
+    path_behind: { label: 'path behind' },
+    path_left: { label: 'path left' },
+    path_right: { label: 'path right' },
     wall_ahead: { label: 'wall ahead' },
     gem_here: { label: 'gem here' },
     on_paint: { label: 'on paint tile' },
@@ -49,6 +52,10 @@ const BLOCK_DEFS = {
     move_forward: { label: 'Move Forward', icon: '⬆️', cat: 'move' },
     turn_left: { label: 'Turn Left', icon: '↩️', cat: 'turn' },
     turn_right: { label: 'Turn Right', icon: '↪️', cat: 'turn' },
+    turn_to: {
+        label: 'Face', icon: '🧭', cat: 'turn',
+        selectOptions: { north: '↑ North', south: '↓ South', east: '→ East', west: '← West' }
+    },
     pick_up: { label: 'Pick Up', icon: '💎', cat: 'action' },
     paint: { label: 'Paint Tile', icon: '🎨', cat: 'action' },
     repeat: { label: 'Repeat', icon: '🔁', cat: 'loop', hasBody: true, hasInput: true, inputDefault: 2 },
@@ -351,7 +358,7 @@ const LEVELS = [
     {
         title: 'While Loops',
         description: 'Use while-loops to walk corridors of unknown length. No counting needed!',
-        hint: '<code>while path_ahead():</code> repeats its body as long as the way is clear. Use it for each straight stretch, with a turn in between.',
+        hint: '<code>while path(ahead):</code> repeats its body as long as the way is clear. Use it for each straight stretch, with a turn in between.',
         mode: 'text',
         rows: 5, cols: 8,
         grid: [
@@ -401,7 +408,7 @@ const LEVELS = [
     {
         title: 'Auto Collector',
         description: 'Walk a long corridor and automatically collect any gems you find. Combine while and if!',
-        hint: 'Use <code>while path_ahead():</code> with <code>move()</code> and <code>if gem_here():</code> + <code>pick_up()</code> inside.',
+        hint: 'Use <code>while path(ahead):</code> with <code>move()</code> and <code>if gem_here():</code> + <code>pick_up()</code> inside.',
         mode: 'text',
         rows: 3, cols: 12,
         grid: [
@@ -423,7 +430,7 @@ const LEVELS = [
     {
         title: 'Zigzag',
         description: 'Navigate the zigzag corridors using while-loops for each stretch!',
-        hint: 'Repeat the pattern: walk while clear, turn right, walk while clear, turn left. Wrap it in a for-loop!',
+        hint: 'Use <code>while path(ahead): move()</code> for each stretch. Try <code>turn(south)</code>, <code>turn(east)</code>, <code>turn(west)</code> to face the right direction at each bend!',
         mode: 'text',
         rows: 7, cols: 6,
         grid: [
@@ -438,7 +445,7 @@ const LEVELS = [
         start: { r: 0, c: 0, dir: DIR.RIGHT },
         goals: [{ r: 6, c: 5 }],
         gems: [],
-        textCommands: ['move', 'turn_left', 'turn_right', 'while_cond', 'for_range', 'cond_path_ahead'],
+        textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'while_cond', 'for_range', 'cond_path_ahead'],
         blocks: [],
         maxBlocks: 25,
         stars: [16, 11, 7],
@@ -462,7 +469,7 @@ const LEVELS = [
         start: { r: 0, c: 0, dir: DIR.RIGHT },
         goals: [{ r: 4, c: 6 }],
         gems: [],
-        textCommands: ['move', 'turn_left', 'turn_right', 'for_range', 'while_cond', 'if_cond', 'cond_path_ahead', 'cond_wall_ahead'],
+        textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'for_range', 'while_cond', 'if_cond', 'cond_path_ahead', 'cond_wall_ahead'],
         blocks: [],
         maxBlocks: 25,
         stars: [14, 10, 6],
@@ -498,7 +505,7 @@ const LEVELS = [
     {
         title: 'Gate Runner',
         description: 'A blue gate blocks your path! Find the blue switch to open it, then navigate through.',
-        hint: 'Go down, then right to the switch (it opens the gate). Back up and right through the gate to the flag. Try using <code>while path_ahead()</code> for each leg.',
+        hint: 'Go down, then right to the switch (it opens the gate). Back up and right through the gate to the flag. Try using <code>while path(ahead)</code> for each leg.',
         mode: 'text',
         rows: 3, cols: 6,
         grid: [
@@ -509,7 +516,7 @@ const LEVELS = [
         start: { r: 0, c: 0, dir: DIR.DOWN },
         goals: [{ r: 0, c: 5 }],
         gems: [],
-        textCommands: ['move', 'turn_left', 'turn_right', 'while_cond', 'for_range', 'cond_path_ahead'],
+        textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'while_cond', 'for_range', 'cond_path_ahead'],
         blocks: [],
         maxBlocks: 15,
         stars: [12, 10, 8],
@@ -541,7 +548,7 @@ const LEVELS = [
     {
         title: 'Right-Hand Rule',
         description: 'Navigate the L-shaped corridor, collecting gems along the way. The path always turns right!',
-        hint: 'Use a for-loop with <code>while path_ahead(): move()</code> and <code>turn(right)</code>. Three legs, three right turns!',
+        hint: 'Use a for-loop with <code>while path(ahead): move()</code> and <code>turn(right)</code>. Three legs, three right turns!',
         mode: 'text',
         rows: 5, cols: 5,
         grid: [
@@ -554,7 +561,7 @@ const LEVELS = [
         start: { r: 0, c: 0, dir: DIR.RIGHT },
         goals: [{ r: 4, c: 0 }],
         gems: [{ r: 0, c: 2 }, { r: 2, c: 4 }, { r: 4, c: 2 }],
-        textCommands: ['move', 'turn_right', 'pick_up', 'for_range', 'while_cond', 'if_cond', 'cond_path_ahead', 'cond_gem_here'],
+        textCommands: ['move', 'turn_right', 'turn_to', 'pick_up', 'for_range', 'while_cond', 'if_cond', 'cond_path_ahead', 'cond_path_right', 'cond_gem_here'],
         blocks: [],
         maxBlocks: 15,
         stars: [8, 6, 5],
@@ -565,7 +572,7 @@ const LEVELS = [
     {
         title: 'Smart Painter',
         description: 'Walk the corridor and paint only the tiles that need it. Use <code>on_paint()</code> to check!',
-        hint: 'Use <code>paint()</code> first (you start on a paint tile), then <code>while path_ahead(): move(); if on_paint(): paint()</code>.',
+        hint: 'Use <code>paint()</code> first (you start on a paint tile), then <code>while path(ahead): move(); if on_paint(): paint()</code>.',
         mode: 'text',
         rows: 1, cols: 12,
         grid: [
@@ -586,7 +593,7 @@ const LEVELS = [
     {
         title: 'The Serpentine',
         description: 'Snake across 3 rows collecting gems and painting empty tiles. Use while loops and if/else!',
-        hint: 'Row 1: walk right (while path_ahead), sort gems/paint. Turn down+left. Row 2: walk left, sort. Turn down+right. Row 3: walk right, sort. Reach goal.',
+        hint: 'Row 1: walk right (while path(ahead)), sort gems/paint. Turn down+left. Row 2: walk left, sort. Turn down+right. Row 3: walk right, sort. Reach goal.',
         mode: 'text',
         rows: 3, cols: 8,
         grid: [
@@ -602,7 +609,7 @@ const LEVELS = [
             { r: 2, c: 0 }, { r: 2, c: 3 }, { r: 2, c: 7 },
         ],
         requirePaint: true,
-        textCommands: ['move', 'turn_left', 'turn_right', 'pick_up', 'paint', 'while_cond', 'if_cond', 'else_clause', 'cond_path_ahead', 'cond_gem_here'],
+        textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'pick_up', 'paint', 'while_cond', 'if_cond', 'else_clause', 'cond_path_ahead', 'cond_gem_here'],
         blocks: [],
         maxBlocks: 50,
         stars: [35, 28, 22],
@@ -613,7 +620,7 @@ const LEVELS = [
     {
         title: 'Grand Master',
         description: 'The ultimate challenge! Navigate a multi-room course with walls, collect all gems, paint all tiles, and reach the exit.',
-        hint: 'Break it into sections. Use while path_ahead() to traverse open corridors, if/else for gem/paint decisions, and turns to navigate the rooms.',
+        hint: 'Break it into sections. Use while path(ahead) to traverse open corridors, if/else for gem/paint decisions, and turns to navigate the rooms.',
         mode: 'text',
         rows: 5, cols: 9,
         grid: [
@@ -631,7 +638,7 @@ const LEVELS = [
             { r: 4, c: 1 }, { r: 4, c: 5 }, { r: 4, c: 8 },
         ],
         requirePaint: true,
-        textCommands: ['move', 'turn_left', 'turn_right', 'pick_up', 'paint', 'for_range', 'while_cond', 'if_cond', 'if_not_cond', 'else_clause', 'cond_path_ahead', 'cond_wall_ahead', 'cond_gem_here', 'cond_on_paint'],
+        textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'pick_up', 'paint', 'for_range', 'while_cond', 'if_cond', 'if_not_cond', 'else_clause', 'cond_path_ahead', 'cond_path_behind', 'cond_path_left', 'cond_path_right', 'cond_wall_ahead', 'cond_gem_here', 'cond_on_paint'],
         blocks: [],
         maxBlocks: 60,
         stars: [40, 32, 24],
