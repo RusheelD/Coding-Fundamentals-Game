@@ -317,17 +317,15 @@ class BlockManager {
             // read condition dropdown (C-blocks) or direction select (flat blocks)
             const select = el.querySelector(':scope > .c-block-top > select') || el.querySelector(':scope > select');
             if (select) {
-                if (node.type === 'if_cond' || node.type === 'while_cond' || node.type === 'if_not_cond' || node.type === 'while_not_cond') {
+                if (node.type === 'if_cond' || node.type === 'while_cond') {
                     node.condition = select.value;
                 } else {
                     node.direction = select.value;
                 }
             }
-            // map block types → generic engine types; wrap condition in {op:'not'} for not-variants
+            // map block types → generic engine types
             if (node.type === 'if_cond') node.type = 'if';
-            if (node.type === 'if_not_cond') { node.type = 'if'; node.condition = { op: 'not', operand: node.condition }; }
             if (node.type === 'while_cond') node.type = 'while';
-            if (node.type === 'while_not_cond') { node.type = 'while'; node.condition = { op: 'not', operand: node.condition }; }
             // read children (nested blocks)
             const body = el.querySelector(':scope > .block-body, :scope > .c-block-body');
             if (body) node.children = this._readBlocks(body);

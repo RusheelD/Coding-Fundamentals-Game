@@ -58,15 +58,9 @@
         renderLevelCards();
     }
 
-    /* secret: click the logo 5 times to unlock all levels */
-    let _logoClicks = 0;
-    let _logoTimer = null;
-    document.querySelector('#level-select-screen .ls-logo').addEventListener('click', () => {
-        _logoClicks++;
-        clearTimeout(_logoTimer);
-        _logoTimer = setTimeout(() => { _logoClicks = 0; }, 1500);
-        if (_logoClicks >= 5) {
-            _logoClicks = 0;
+    /* secret: click the star icon to unlock all levels */
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === 'ls-star-icon') {
             engine.unlockAll();
             renderLevelCards();
         }
@@ -75,7 +69,7 @@
     function renderLevelCards() {
         const totalStars = engine.starsEarned.reduce((a, b) => a + (b || 0), 0);
         const maxStars = LEVELS.length * 3;
-        lsStarTotal.textContent = `⭐ ${totalStars} / ${maxStars}`;
+        lsStarTotal.innerHTML = `<span id="ls-star-icon">⭐</span> ${totalStars} / ${maxStars}`;
 
         lsGrid.innerHTML = '';
         for (let i = 0; i < LEVELS.length; i++) {

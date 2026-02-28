@@ -74,9 +74,7 @@ const BLOCK_DEFS = {
     break_cmd: { label: 'Break', icon: '🚫', cat: 'cond' },
     repeat: { label: 'Repeat', icon: '🔁', cat: 'loop', hasBody: true, hasInput: true, inputDefault: 2 },
     if_cond: { label: 'If', icon: '❓', cat: 'cond', hasBody: true, hasCondition: true },
-    if_not_cond: { label: 'If Not', icon: '❓', cat: 'cond', hasBody: true, hasCondition: true },
     while_cond: { label: 'While', icon: '🔄', cat: 'loop', hasBody: true, hasCondition: true },
-    while_not_cond: { label: 'While Not', icon: '🔄', cat: 'loop', hasBody: true, hasCondition: true },
 };
 
 /**
