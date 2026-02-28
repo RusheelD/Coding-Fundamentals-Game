@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Quest – Block Coding Game</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" />
+</head>
+<body>
+  <!-- ==================== LEVEL SELECT SCREEN ==================== -->
+  <div id="level-select-screen">
+    <div class="ls-header">
+      <div class="ls-logo">&#x1F3AE; Code Quest</div>
+      <p class="ls-subtitle">Solve puzzles with blocks &amp; code!</p>
+      <div class="ls-star-total" id="ls-star-total"></div>
+    </div>
+    <div class="ls-grid" id="ls-grid"></div>
+  </div>
+
+  <!-- ==================== TOP BAR ==================== -->
+  <header id="top-bar" class="hidden">
+    <div class="logo">&#x1F3AE; Code Quest</div>
+    <div id="level-indicator">Level <span id="level-num">1</span> / <span id="level-total">10</span></div>
+    <div id="level-title-bar"></div>
+  </header>
+
+  <!-- ==================== MAIN LAYOUT ==================== -->
+  <main id="app" class="hidden">
+    <!-- LEFT: Block Toolbox -->
+    <section id="toolbox-panel">
+      <h2>Blocks</h2>
+      <div id="toolbox"></div>
+      <div id="code-reference" class="hidden"></div>
+      <div id="block-limit-display"></div>
+    </section>
+
+    <!-- CENTRE-LEFT: Program workspace -->
+    <section id="workspace-panel">
+      <h2>Your Program</h2>
+      <div id="workspace" class="drop-zone"></div>
+      <textarea id="code-editor" class="hidden" spellcheck="false" placeholder="# Write your Python code here..."></textarea>
+      <div id="workspace-buttons">
+        <button id="btn-run" class="btn btn-green" title="Run program">&#9654; Run</button>
+        <button id="btn-step" class="btn btn-blue" title="Step through">&#x1F9B6; Step</button>
+        <button id="btn-reset" class="btn btn-orange" title="Reset">&#x21BA; Reset</button>
+        <button id="btn-clear" class="btn btn-red" title="Clear workspace">&#x1F5D1; Clear</button>
+        <button id="btn-speed" class="btn btn-purple" title="Toggle speed">&#x23E9; Fast</button>
+      </div>
+    </section>
+
+    <!-- CENTRE-RIGHT: Game grid -->
+    <section id="grid-panel">
+      <h2>World</h2>
+      <canvas id="game-canvas"></canvas>
+      <div id="message-box"></div>
+    </section>
+
+    <!-- RIGHT: Instructions / level info -->
+    <section id="info-panel">
+      <h2>Goal</h2>
+      <div id="level-description"></div>
+      <h3>Hint</h3>
+      <div id="level-hint"></div>
+      <div id="stars-display"></div>
+    </section>
+  </main>
+
+  <!-- ==================== MODAL: Level Select ==================== -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal">
+      <button id="modal-close" class="btn">&times;</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="js/levels.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/blocks.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
