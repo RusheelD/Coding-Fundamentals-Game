@@ -99,8 +99,8 @@ const LEVELS = [
         goals: [{ r: 2, c: 3 }],
         gems: [],
         blocks: ['move_forward'],
-        maxBlocks: 5,
-        stars: [5, 4, 3],
+        maxBlocks: 9,
+        stars: [9, 5, 3],
     },
 
     // ──────────── LEVEL 2 ────────────
@@ -121,8 +121,8 @@ const LEVELS = [
         goals: [{ r: 0, c: 4 }],
         gems: [{ r: 4, c: 3 }],
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up'],
-        maxBlocks: 14,
-        stars: [14, 13, 12],
+        maxBlocks: 25,
+        stars: [25, 16, 10],
     },
 
     // ──────────── LEVEL 3 ────────────
@@ -229,8 +229,8 @@ const LEVELS = [
         requirePaint: true,
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
         conditions: ['path_ahead', 'gem_here', 'on_paint'],
-        maxBlocks: 18,
-        stars: [18, 12, 8],
+        maxBlocks: 30,
+        stars: [30, 20, 13],
     },
 
     // ──────────── LEVEL 8 ────────────
@@ -275,8 +275,8 @@ const LEVELS = [
         gems: [{ r: 1, c: 0 }, { r: 0, c: 3 }],
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
         conditions: ['path_ahead', 'gem_here', 'on_paint', 'wall_ahead'],
-        maxBlocks: 18,
-        stars: [18, 14, 10],
+        maxBlocks: 40,
+        stars: [40, 26, 16],
     },
 
     // ──────────── LEVEL 10 ────────────
@@ -299,8 +299,8 @@ const LEVELS = [
         requirePaint: true,
         blocks: ['move_forward', 'turn_left', 'turn_right', 'pick_up', 'paint', 'repeat', 'if_cond', 'while_cond'],
         conditions: ['path_ahead', 'gem_here', 'on_paint', 'wall_ahead'],
-        maxBlocks: 35,
-        stars: [35, 25, 18],
+        maxBlocks: 50,
+        stars: [50, 35, 20],
     },
 
     // ══════════════════════════════════════════════════════════
@@ -539,8 +539,8 @@ const LEVELS = [
         gems: [],
         textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'pick_up', 'paint', 'for_range', 'while_cond', 'if_cond', 'cond_path_ahead', 'cond_gem_here', 'cond_on_paint', 'cond_wall_ahead'],
         blocks: [],
-        maxBlocks: 15,
-        stars: [12, 10, 8],
+        maxBlocks: 20,
+        stars: [20, 14, 8],
     },
 
     // ──────────── LEVEL 21 (TEXT) ────────────
