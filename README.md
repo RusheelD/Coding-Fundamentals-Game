@@ -27,4 +27,3 @@ docs/
     ├── renderer.js     # Canvas rendering
     └── app.js          # Wiring & UI logic
 ```
-
