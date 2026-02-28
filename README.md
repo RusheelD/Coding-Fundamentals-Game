@@ -4,7 +4,7 @@ A Karel-style block-coding game where you drag-and-drop programming blocks to gu
 
 ## Play
 
-Visit the live site (once GitHub Pages is enabled) or open `pages/index.html` locally.
+Visit the live site (once GitHub Pages is enabled) or open `docs/index.html` locally.
 
 ## Features
 
@@ -14,17 +14,10 @@ Visit the live site (once GitHub Pages is enabled) or open `pages/index.html` lo
 - **Progress saved** in localStorage
 - **Step-through mode** for debugging your program one action at a time
 
-## GitHub Pages Setup
-
-1. Go to **Settings → Pages** in this repository
-2. Set **Source** to `Deploy from a branch`
-3. Set **Branch** to `main` and **folder** to `/pages`
-4. Save — your site will be live at `https://<user>.github.io/Coding-Fundamentals-Game/`
-
 ## Project Structure
 
 ```text
-pages/
+docs/
 ├── index.html          # Main page
 ├── css/style.css       # Styles
 └── js/
@@ -34,3 +27,4 @@ pages/
     ├── renderer.js     # Canvas rendering
     └── app.js          # Wiring & UI logic
 ```
+
