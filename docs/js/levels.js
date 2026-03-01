@@ -585,7 +585,7 @@ const LEVELS = [
         textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'pick_up', 'paint', 'for_range', 'while_cond', 'if_cond', 'else_clause', 'cond_path_ahead', 'cond_path_right', 'cond_gem_here', 'cond_on_paint', 'cond_wall_ahead'],
         blocks: [],
         maxBlocks: 15,
-        stars: [8, 6, 5],
+        stars: [8, 7, 6],
     },
 
     // ──────────── LEVEL 23 (TEXT) ────────────
