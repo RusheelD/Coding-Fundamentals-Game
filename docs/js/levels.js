@@ -493,7 +493,7 @@ const LEVELS = [
         textCommands: ['move', 'turn_left', 'turn_right', 'turn_to', 'pick_up', 'paint', 'for_range', 'while_cond', 'if_cond', 'cond_path_ahead', 'cond_gem_here', 'cond_on_paint', 'cond_wall_ahead'],
         blocks: [],
         maxBlocks: 25,
-        stars: [14, 10, 6],
+        stars: [16, 11, 7],
     },
 
     // ──────────── LEVEL 19 (TEXT) ────────────
