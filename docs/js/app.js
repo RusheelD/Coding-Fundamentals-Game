@@ -112,13 +112,15 @@
             card.dataset.lv = i;
 
             if (locked) {
+                const lockLabel = lv.mode === 'text' ? `P${i - 9}` : `B${i + 1}`;
                 card.innerHTML = `
-                    <div class="ls-num">${i + 1}</div>
+                    <div class="ls-num">${lockLabel}</div>
                     <div class="ls-lock-icon">🔒</div>
                     <div class="ls-desc">Complete previous levels</div>`;
             } else {
+                const lvLabel = lv.mode === 'text' ? `P${i - 9}` : `B${i + 1}`;
                 card.innerHTML = `
-                    <div class="ls-num">${i + 1}</div>
+                    <div class="ls-num">${lvLabel}</div>
                     <div class="ls-title">${lv.title}</div>
                     <div class="ls-stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
                     ${lv.mode === 'text' ? '<div class="ls-badge ls-badge-py">🐍 Python</div>' : '<div class="ls-badge ls-badge-blocks">🧩 Blocks</div>'}`;
@@ -174,7 +176,8 @@
             }
         }
 
-        levelNum.textContent = index + 1;
+        const lvTag = lv.mode === 'text' ? `P${index - 9}` : `B${index + 1}`;
+        levelNum.textContent = lvTag;
         titleBar.textContent = lv.title;
         descEl.innerHTML = lv.description;
         hintEl.innerHTML = lv.hint;
