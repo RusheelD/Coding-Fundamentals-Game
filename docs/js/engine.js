@@ -18,7 +18,7 @@ class GameEngine {
         this.speed = 350;
         this.fastSpeed = 80;
         this.normalSpeed = 350;
-        this.maxIterations = 500;
+        this.maxIterations = 2000;
         this.onStep = null;
         this.onFinish = null;
         this.starsEarned = [];

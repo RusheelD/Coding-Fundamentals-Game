@@ -190,10 +190,13 @@ class BlockManager {
 
     /* -------- drag & drop -------- */
     _initDragListeners() {
+        this._didDrag = false;
+
         // drag start on any block
         document.addEventListener('dragstart', (e) => {
             const block = e.target.closest('.block');
             if (!block) return;
+            this._didDrag = true;
             this._dragged = block;
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/plain', block.dataset.type);
@@ -210,6 +213,26 @@ class BlockManager {
 
         // make main workspace a drop zone
         this._makeDropZone(this.workspaceEl);
+
+        // click-to-add: clicking a toolbox block appends a copy to workspace
+        this.toolboxEl.addEventListener('click', (e) => {
+            // ignore if this was a drag, or if clicking a select/input inside the block
+            if (this._didDrag) { this._didDrag = false; return; }
+            const block = e.target.closest('.block');
+            if (!block || block.dataset.toolbox !== '1') return;
+            if (e.target.closest('select') || e.target.closest('input')) return;
+            if (this._countWorkspaceBlocks() >= this.maxBlocks) return;
+            const type = block.dataset.type;
+            const def = BLOCK_DEFS[type];
+            if (!def) return;
+            const clone = this._createBlockEl(type, def, false);
+            this.workspaceEl.appendChild(clone);
+            this._updateBlockCount();
+        });
+        // reset drag flag if drag ended without drop
+        document.addEventListener('dragend', () => {
+            setTimeout(() => { this._didDrag = false; }, 0);
+        });
     }
 
     /**
